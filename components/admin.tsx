@@ -1624,7 +1624,8 @@ export default function Admin({
                   } else if (modal === "Logout") {
                     setModal("");
                     setDetail(null);
-                    notify("Demo session ended. Workspace remains available.");
+                    notify("Admin session ended. Redirecting to login...");
+                    window.location.href = "/login";
                   } else
                     updateStatus(
                       (
