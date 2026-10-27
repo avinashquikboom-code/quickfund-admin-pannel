@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ArrowUpRight,
@@ -34,11 +33,6 @@ export default function AdminLogin() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [authError, setAuthError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  // Forgot Password Modal State
-  const [forgotModalOpen, setForgotModalOpen] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotSubmitted, setForgotSubmitted] = useState(false);
 
   // Load remembered email on mount
   useEffect(() => {
@@ -100,8 +94,7 @@ export default function AdminLogin() {
 
     // Simulate authentication processing
     setTimeout(() => {
-      // For demonstration, any valid email and password >= 6 characters passes
-      // If someone enters test credentials with wrong format it would fail
+      // Demo validation rule: password must be at least 6 chars and not 'wrong123'
       if (password === "wrong123") {
         setAuthError("Invalid credentials. Please verify your admin email and password.");
         setIsLoading(false);
@@ -110,11 +103,14 @@ export default function AdminLogin() {
 
       setSuccessMessage("Authentication successful. Opening admin workspace...");
       try {
-        localStorage.setItem("qf-admin-session", JSON.stringify({
-          email: email.trim(),
-          role: "Super Administrator",
-          loginTime: new Date().toISOString(),
-        }));
+        localStorage.setItem(
+          "qf-admin-session",
+          JSON.stringify({
+            email: email.trim(),
+            role: "Super Administrator",
+            loginTime: new Date().toISOString(),
+          })
+        );
       } catch {
         // Ignore
       }
@@ -123,19 +119,6 @@ export default function AdminLogin() {
         router.push("/dashboard");
       }, 700);
     }, 900);
-  };
-
-  const handleForgotSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!forgotEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail.trim())) {
-      return;
-    }
-    setForgotSubmitted(true);
-    setTimeout(() => {
-      setForgotModalOpen(false);
-      setForgotSubmitted(false);
-      setForgotEmail("");
-    }, 3000);
   };
 
   return (
@@ -149,8 +132,8 @@ export default function AdminLogin() {
 
         {/* Top Branding */}
         <div className="relative z-10">
-          <Link href="/dashboard" className="inline-flex items-center gap-3 group">
-            <span className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#10b981] to-[#087443] flex items-center justify-center text-white shadow-lg shadow-[#087443]/30 -rotate-6 transition-transform group-hover:rotate-0">
+          <div className="inline-flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#10b981] to-[#087443] flex items-center justify-center text-white shadow-lg shadow-[#087443]/30 -rotate-6">
               <ArrowUpRight size={22} className="stroke-[2.5]" />
             </span>
             <div className="flex flex-col">
@@ -161,7 +144,7 @@ export default function AdminLogin() {
                 Enterprise Admin
               </span>
             </div>
-          </Link>
+          </div>
         </div>
 
         {/* Center Content: Platform Highlights */}
@@ -217,7 +200,7 @@ export default function AdminLogin() {
       <div className="flex-1 flex flex-col justify-between p-4 sm:p-8 lg:p-12 xl:p-16 overflow-y-auto">
         {/* Mobile Header (Hidden on Desktop) */}
         <div className="lg:hidden flex items-center justify-between py-2 mb-6">
-          <Link href="/dashboard" className="inline-flex items-center gap-2.5">
+          <div className="inline-flex items-center gap-2.5">
             <span className="w-8 h-8 rounded-lg bg-[#087443] flex items-center justify-center text-white shadow-md -rotate-6">
               <ArrowUpRight size={18} className="stroke-[2.5]" />
             </span>
@@ -229,7 +212,7 @@ export default function AdminLogin() {
                 Admin Console
               </span>
             </div>
-          </Link>
+          </div>
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-medium border border-emerald-200">
             <ShieldCheck size={12} className="text-[#087443]" />
             Secure
@@ -238,7 +221,6 @@ export default function AdminLogin() {
 
         {/* Centered Login Card */}
         <div className="max-w-[420px] w-full mx-auto my-auto py-4">
-          {/* Card Wrapper */}
           <div className="bg-white rounded-2xl border border-[#dfe7e2] p-6 sm:p-8 shadow-[0_4px_20px_-4px_rgba(23,43,58,0.05)]">
             {/* Header Badge & Title */}
             <div className="mb-6">
@@ -275,13 +257,13 @@ export default function AdminLogin() {
 
             {/* Error Banner */}
             {authError && (
-              <div className="mb-5 p-3 rounded-lg bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-800 animate-fadeIn">
+              <div className="mb-5 p-3 rounded-lg bg-red-50 border border-red-200 flex items-start gap-2.5 text-xs text-red-800">
                 <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
                 <div className="flex-1 font-medium">{authError}</div>
                 <button
                   type="button"
                   onClick={() => setAuthError(null)}
-                  className="text-red-400 hover:text-red-700"
+                  className="text-red-400 hover:text-red-700 cursor-pointer"
                   aria-label="Dismiss error"
                 >
                   <X size={14} />
@@ -291,7 +273,7 @@ export default function AdminLogin() {
 
             {/* Success Banner */}
             {successMessage && (
-              <div className="mb-5 p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center gap-2.5 text-xs text-emerald-800 animate-fadeIn">
+              <div className="mb-5 p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center gap-2.5 text-xs text-emerald-800">
                 <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
                 <span className="font-semibold">{successMessage}</span>
               </div>
@@ -307,8 +289,8 @@ export default function AdminLogin() {
                 >
                   Admin Email
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#83918e]">
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 flex items-center pointer-events-none text-[#83918e] z-10">
                     <Mail size={16} />
                   </div>
                   <input
@@ -321,7 +303,8 @@ export default function AdminLogin() {
                       if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
                     }}
                     placeholder="admin@quickfunds.com"
-                    className={`w-full pl-10 pr-3.5 py-2.5 text-sm rounded-lg bg-white text-[#172b3a] border transition-all placeholder:text-[#9aa59f] focus:outline-none ${
+                    style={{ paddingLeft: "42px", paddingRight: "14px" }}
+                    className={`w-full py-2.5 text-sm rounded-lg bg-white text-[#172b3a] border transition-all placeholder:text-[#9aa59f] focus:outline-none ${
                       errors.email
                         ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                         : "border-[#dfe7e2] focus:border-[#087443] focus:ring-2 focus:ring-[#087443]/15"
@@ -341,23 +324,14 @@ export default function AdminLogin() {
 
               {/* Password Field */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label
-                    htmlFor="admin-password"
-                    className="block text-xs font-bold text-[#172b3a] uppercase tracking-wider"
-                  >
-                    Password
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setForgotModalOpen(true)}
-                    className="text-xs font-semibold text-[#087443] hover:text-[#065d37] hover:underline cursor-pointer"
-                  >
-                    Forgot Password?
-                  </button>
-                </div>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#83918e]">
+                <label
+                  htmlFor="admin-password"
+                  className="block text-xs font-bold text-[#172b3a] mb-1.5 uppercase tracking-wider"
+                >
+                  Password
+                </label>
+                <div className="relative flex items-center">
+                  <div className="absolute left-3.5 flex items-center pointer-events-none text-[#83918e] z-10">
                     <Lock size={16} />
                   </div>
                   <input
@@ -370,7 +344,8 @@ export default function AdminLogin() {
                       if (errors.password) setErrors((prev) => ({ ...prev, password: undefined }));
                     }}
                     placeholder="Enter your password"
-                    className={`w-full pl-10 pr-11 py-2.5 text-sm rounded-lg bg-white text-[#172b3a] border transition-all placeholder:text-[#9aa59f] focus:outline-none ${
+                    style={{ paddingLeft: "42px", paddingRight: "44px" }}
+                    className={`w-full py-2.5 text-sm rounded-lg bg-white text-[#172b3a] border transition-all placeholder:text-[#9aa59f] focus:outline-none ${
                       errors.password
                         ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
                         : "border-[#dfe7e2] focus:border-[#087443] focus:ring-2 focus:ring-[#087443]/15"
@@ -382,7 +357,7 @@ export default function AdminLogin() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#83918e] hover:text-[#172b3a] cursor-pointer"
+                    className="absolute right-3.5 flex items-center text-[#83918e] hover:text-[#172b3a] cursor-pointer z-10"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -396,7 +371,7 @@ export default function AdminLogin() {
                 )}
               </div>
 
-              {/* Remember Me Checkbox */}
+              {/* Remember Me Checkbox (Aligned Left Directly Below Password) */}
               <div className="pt-1 pb-1">
                 <label className="flex items-center gap-2.5 cursor-pointer select-none">
                   <input
@@ -411,7 +386,7 @@ export default function AdminLogin() {
                 </label>
               </div>
 
-              {/* Submit Button */}
+              {/* Submit Button (Full Width) */}
               <button
                 type="submit"
                 disabled={isLoading}
@@ -430,17 +405,6 @@ export default function AdminLogin() {
                 )}
               </button>
             </form>
-
-            {/* Direct Access Link for Developer/Stakeholder review */}
-            <div className="mt-6 pt-5 border-t border-[#dfe7e2] text-center">
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-[#83918e] hover:text-[#087443] transition-colors"
-              >
-                <span>Continue directly to Dashboard</span>
-                <ArrowRight size={12} />
-              </Link>
-            </div>
           </div>
         </div>
 
@@ -458,78 +422,6 @@ export default function AdminLogin() {
           </div>
         </div>
       </div>
-
-      {/* ================= FORGOT PASSWORD MODAL ================= */}
-      {forgotModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-[#dfe7e2] relative animate-scaleUp">
-            <button
-              onClick={() => {
-                setForgotModalOpen(false);
-                setForgotSubmitted(false);
-              }}
-              className="absolute top-4 right-4 text-[#83918e] hover:text-[#172b3a] p-1 rounded-full hover:bg-gray-100 transition-colors"
-              aria-label="Close dialog"
-            >
-              <X size={18} />
-            </button>
-
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-[#087443] flex items-center justify-center mb-3">
-              <Lock size={20} />
-            </div>
-
-            <h3 className="text-lg font-bold text-[#172b3a]">Reset Admin Password</h3>
-            <p className="text-xs text-[#83918e] mt-1 mb-4 leading-relaxed">
-              Enter your registered corporate email address and security instructions will be dispatched to your inbox.
-            </p>
-
-            {forgotSubmitted ? (
-              <div className="p-3.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 space-y-1">
-                <div className="font-bold flex items-center gap-1.5">
-                  <CheckCircle2 size={14} className="text-emerald-600" />
-                  Password reset link sent!
-                </div>
-                <p className="text-emerald-700">
-                  Please check your inbox for instructions to reset your admin credentials.
-                </p>
-              </div>
-            ) : (
-              <form onSubmit={handleForgotSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="forgot-email" className="block text-xs font-bold text-[#172b3a] mb-1">
-                    Corporate Email
-                  </label>
-                  <input
-                    id="forgot-email"
-                    type="email"
-                    required
-                    value={forgotEmail}
-                    onChange={(e) => setForgotEmail(e.target.value)}
-                    placeholder="admin@quickfunds.com"
-                    className="w-full px-3.5 py-2.5 text-sm rounded-lg border border-[#dfe7e2] focus:border-[#087443] focus:ring-2 focus:ring-[#087443]/15 outline-none"
-                  />
-                </div>
-
-                <div className="flex gap-2 justify-end pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setForgotModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold text-[#83918e] hover:text-[#172b3a] border border-[#dfe7e2] rounded-lg bg-white hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-xs font-semibold text-white bg-[#087443] hover:bg-[#075d37] rounded-lg shadow-sm transition-colors"
-                  >
-                    Send Reset Link
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
